@@ -1,0 +1,136 @@
+=== Testy serwera ===
+
+101–148
+Reakcja serwera na niepoprawne parametry wywołania.
+
+201
+Parametry serwera: -s 2 -r 777
+Klient 0: turn_direction = 1, next_expected_event_no = 0, player_name = Bob201
+Klient 1: turn_direction = -1, next_expected_event_no = 0, player_name = Cezary201
+
+202
+Parametry serwera: -s 2 -r 3 -H 200 -W 100
+Klient 0: turn_direction = 1, next_expected_event_no = 0, player_name = Bob202
+Klient 1: turn_direction = 0, next_expected_event_no = 0, bez nazwy gracza
+Klient 2: turn_direction = -1, next_expected_event_no = 0, player_name = Cezary202
+
+203
+Parametry serwera: -s 2 -r 2
+Klient 0: turn_direction = 1, next_expected_event_no = 0, player_name = Bob203
+Klient 1: za krótki komunikat – jeden bajt o wartości 0
+Klient 2: turn_direction = -1, next_expected_event_no = , player_name = Cezary203
+
+204
+Parametry serwera: -s 2 -r 0 -H 16 -W 16
+Klient 0: turn_direction = 1, next_expected_event_no = 0, player_name = Bob204
+Klient 1: turn_direction = -1, next_expected_event_no = 0, player_name = Cezary204
+Gracz Cezary204 odpada na starcie.
+Serwer generuje zdarzenia PLAYER_ELIMINATED i GAME_OVER.
+
+205
+Parametry serwera: -s 2 -r 777
+Klient 0: turn_direction = 1, next_expected_event_no = 0, player_name = Bob205, używa IPv6
+Klient 1: turn_direction = -1, next_expected_event_no = 0, player_name = Cezary205, używa IPv6
+
+206
+Parametry serwera: -s 2 -r 65535 -H 2048 -W 2048
+Klient 0: turn_direction = 1, next_expected_event_no = 0, player_name = Bob206, używa IPv6
+Klient 1: turn_direction = -1, next_expected_event_no = 0, player_name = Ala206, używa IPv6
+Sprawdza sortowanie nazw graczy.
+
+207
+Parametry serwera: -s 2 -r 7
+Klient 0: turn_direction = 2, next_expected_event_no = 0, player_name = Cezary207
+Klient 1: turn_direction = 1, next_expected_event_no = 0, player_name = Ala207
+Klient 2: turn_direction = -1, next_expected_event_no = 0, player_name = Bob207
+Klient 0 wysyła błędną wartość turn_direction.
+
+208
+Parametry serwera: -s 2 -r 8
+Klient 0: turn_direction = 1, next_expected_event_no = 0, błędna nazwa gracza – pojedyncza spacja
+Klient 1: turn_direction = 1, next_expected_event_no = 0, player_name = Ala208
+Klient 2: turn_direction = -1, next_expected_event_no = 0, player_name = Bob208
+
+209
+Parametry serwera: -s 2 -r 9
+Klient 0: turn_direction = -1, next_expected_event_no = 0, błędna nazwa gracza – znak o kodzie 0
+Klient 1: turn_direction = 1, next_expected_event_no = 0, player_name = Ala209
+Klient 2: turn_direction = -1, next_expected_event_no = 0, player_name = Bob209
+
+210
+Parametry serwera: -s 2 -r 10
+Klient 0: turn_direction = -1, next_expected_event_no = 0, player_name = abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz012
+Klient 1: turn_direction = 1, next_expected_event_no = 0, player_name = ala210
+Klient 2: turn_direction = -1, next_expected_event_no = 0, player_name = bob210
+Błędna nazwa gracza – klient 0 wysyła za długą nazwę gracza (65 znaków).
+
+211
+Parametry serwera: -s 2 -r 11
+Klient 0: turn_direction = 0, next_expected_event_no = 0, player_name = Ala211, używa IPv4
+Klient 1: turn_direction = 1, next_expected_event_no = 0, player_name = Bob211, używa IPv6
+Klient 0: turn_direction = 1, next_expected_event_no = 0, player_name = Ala211, używa IPv4
+
+212
+Parametry serwera: -s 2 -r 12
+Klient 0: turn_direction = 1, next_expected_event_no = 0, player_name = Ala212
+Klient 1: turn_direction = 1, next_expected_event_no = 0, player_name = Bob212
+Klient 0: turn_direction = 1, next_expected_event_no = 1, player_name = Ala212
+
+213
+Parametry serwera: -s 2 -r 13
+Klient 0: turn_direction = 1, next_expected_event_no = 0, player_name = Alicja213
+Klient 1: turn_direction = 1, next_expected_event_no = 0, player_name = Bolek213
+Klient 2: turn_direction = 1, next_expected_event_no = 0, player_name = Cezary213
+Gracz Cezary213 nie załapuje się na rozgrywkę.
+
+214
+Parametry serwera: -s 2 -r 14
+Klient 0: turn_direction = 1, next_expected_event_no = 0, player_name = ala214
+Klient 1: turn_direction = -1, next_expected_event_no = 0, player_name = abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz01
+Klient 1 wysyła nazwę gracza o maksymalnej długości (64 znaki).
+
+215
+Klient 0: turn_direction = 1, next_expected_event_no = 0, player_name = Ala215
+Tu jest przerwa 3 sekundy. Ala215 zostaje odłączona.
+Klient 1: turn_direction = 1, next_expected_event_no = 0, player_name = Bobek215
+Klient 2: turn_direction = 1, next_expected_event_no = 0, player_name = Cezary215
+
+=== Testy klienta ===
+
+301–315
+Reakcja klienta na niepoprawne parametry wywołania.
+
+401
+Brak połączenia z interfejsem użytkownika.
+Interfejs użytkownika nie jest uruchomiony.
+Klient próbuje użyć IPv4 i połączyć się z 127.0.0.1.
+
+402
+Brak połączenia z interfejsem użytkownika.
+Interfejs użytkownika jest uruchomiony tylko na IPv4.
+Klient próbuje użyć IPv6 i połączyć się z localhost.accek.net.
+
+403
+Brak połączenia z serwerem, cokolwiek to oznacza.
+Klient próbuje użyć IPv4 i wysłać coś do 127.0.0.1.
+
+411
+Poprawność zawartości komunikatu do serwera. Pusta nazwa gracza.
+
+412
+Poprawność zawartości komunikatu do serwera. Nazwa gracza o maksymalnej długości
+(64 znaki).
+
+413
+Poprawność okresu wysyłania komunikatu do serwera. Tolerancja 5%.
+
+414
+Poprawność okresu wysyłania komunikatu do serwera. Tolerancja 10%.
+
+415
+Poprawność okresu wysyłania komunikatu do serwera. Tolerancja 50%.
+
+416
+Poprawność zawartości komunikatu do serwera. Nazwa gracza o długości 3 znaków.
+Używa IPv6.
+
