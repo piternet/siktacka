@@ -17,10 +17,6 @@
 
 #define BUFFER_SIZE 2000
 
-// Maks. liczba graczy
-
-#define MAX_PLAYER 20
-
 // Maks. liczba niepustych tokenów w komunikacie wejściowym
 
 #define MAX_TOKENS 30
@@ -32,7 +28,7 @@ int area_width = 20, area_height = 20;  // początkowe rozmiary
 
 GdkColor color;  // bieżący kolor
 
-KolGracz kolgracz[MAX_PLAYER];  // lista opisów graczy
+KolGracz kolgracz[20];  // lista opisów graczy
 int ilgracz = 0;  // bieżąca liczba graczy
 
 GtkWidget *player_box;  // widget z listą graczy
@@ -60,14 +56,12 @@ static void send_message (char* message);
 
 // Proaktywne inicjowanie kolorów
 
-//!!! Przydałoby się więcej kolorów, ale nie mam zdrowia wymyślać.
-
 void init_colors () {
   char *colors[] = {"red", "green", "blue", "yellow", "brown", "cyan",
                     "magenta", "black", "violet", NULL};
   GdkColor color;
 
-  for (int i = 0; i < MAX_PLAYER && colors[i] != NULL; i++) {
+  for (int i = 0; colors[i] != NULL; i++) {
     if (!gdk_color_parse(colors[i], &color))
       syserr("Invalid color spec");
     kolgracz[i].color = color;

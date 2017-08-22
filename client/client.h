@@ -2,30 +2,35 @@
 // Created by piternet on 17.08.17.
 //
 
-#ifndef KLIENT_CLIENT_H
-#define KLIENT_CLIENT_H
+#ifndef CLIENT_CLIENT_H
+#define CLIENT_CLIENT_H
 
 #include <string>
+#include <cstring>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <netinet/tcp.h>
+#include <netdb.h>
+#include <zconf.h>
+#include <mutex>
+#include "utils.h"
+#include "parser.h"
 
-using std::string;
+struct GuiInfo {
+    bool leftPressed, rightPressed;
+    int socket;
+    GuiInfo(bool _leftPressed, bool _rightPressed) : leftPressed(_leftPressed), rightPressed(_rightPressed) {
 
-const string INIT_MSG = "Usage: ./siktacka-client player_name game_server_host[:port] [ui_server_host[:port]]";
-const int MIN_ARGS = 3;
-
-const int DEFAULT_SERVER_PORT = 12345;
-const int DEFAULT_UI_PORT = 12346;
-const string DEFAULT_UI_HOST = "localhost";
-
-void die(string msg) {
-    std::cout << msg << std::endl;
-    exit(1);
-}
-
-struct ClientInfo {
-    string playerName, serverHost, uiHost;
-    int serverPort, uiPort;
+    }
 };
 
-ClientInfo clientInfo;
+std::mutex guiLock;
 
-#endif //KLIENT_CLIENT_H
+namespace turns {
+    const string LEFT_DOWN = "LEFT_KEY_DOWN";
+    const string LEFT_UP = "LEFT_KEY_UP";
+    const string RIGHT_DOWN = "RIGHT_KEY_DOWN";
+    const string RIGHT_UP = "RIGHT_KEY_UP";
+}
+
+#endif //CLIENT_CLIENT_H

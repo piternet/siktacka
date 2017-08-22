@@ -18,13 +18,9 @@ typedef struct {
   GtkWidget *label;
 } KolGracz;
 
-// Maks. liczba graczy
-
-#define MAX_PLAYER 20
-
 // Tablica opisów graczy
 
-extern KolGracz kolgracz[];
+extern KolGracz kolgracz[20];
 extern int ilgracz;
 
 // Widget z listą graczy

@@ -1,51 +1,89 @@
-#include <iostream>
-#include <algorithm>
-
 #include "client.h"
 
-void parseServerInfo(string serverHost) {
-    std::size_t found = serverHost.find_last_of(":");
-    // we assume that IPv6 addresses won't be given with port numbers
-    if(std::count(serverHost.begin(), serverHost.end(), ':') <= 1 && found != string::npos) {
-        string port = serverHost.substr(found+1), host = serverHost.substr(0, found);
-        clientInfo.serverHost = host;
-        clientInfo.serverPort = std::stoi(port);
+void connectToGUI(ClientInfo &clientInfo, int &guiSocket) {
+    struct sockaddr_storage gui;
+    char message[] = "NEW_GAME 800 600 piternet anon anonek";
+
+    // Convert hostname to IP address
+    struct addrinfo hints, *res = NULL;
+    memset(&hints, 0, sizeof(addrinfo));
+    hints.ai_family = AF_UNSPEC;
+
+    if (getaddrinfo(clientInfo.uiHost.c_str(), intToString(clientInfo.uiPort).c_str(), &hints, &res))
+        die("Cannot resolve hostname");
+    memcpy(&gui, res->ai_addr, res->ai_addrlen);
+    auto guiLen = res->ai_addrlen;
+
+    // Create socket
+    guiSocket = socket(res->ai_family, SOCK_STREAM, 0);
+    // Turn off Nagle's algorithm to minimalize delay
+    int flag = 1;
+    int result = setsockopt(guiSocket, IPPROTO_TCP, TCP_NODELAY, (char *) &flag, sizeof(int));
+    if(result < 0)
+        die("Could not turn off Nagle's algortihm");
+    if(guiSocket == -1)
+        die("Could not create socket for GUI connection");
+    freeaddrinfo(res);
+
+    std::cout << "GUI: I want to connect to " << clientInfo.uiHost.c_str() << " (translated to "
+              << "costam" << "):" << clientInfo.uiPort<< std::endl;
+
+    if(connect(guiSocket, (struct sockaddr*) &gui, guiLen) < 0) {
+        die("Connecting to GUI failed.");
     }
-    else {
-        clientInfo.serverHost = serverHost;
-        clientInfo.serverPort = DEFAULT_SERVER_PORT;
-    }
+
+    if(send(guiSocket, message, strlen(message), 0) < 0)
+        die("Sending message to GUI failed.");
 }
 
-void parseUIInfo(string uiHost) {
-    std::size_t found = uiHost.find_last_of(":");
-    // we assume that IPv6 addresses won't be given with port numbers
-    if(std::count(uiHost.begin(), uiHost.end(), ':') <= 1 && found != string::npos) {
-        string port = uiHost.substr(found+1), host = uiHost.substr(0, found);
-        clientInfo.uiHost = host;
-        clientInfo.uiPort = std::stoi(port);
+bool readLineFromGui(int socket, string &line) {
+    static string buffer;
+    string::iterator pos;
+    while((pos = find(buffer.begin(), buffer.end(), NEWLINE)) == buffer.end()) {
+        char buff[BUFF_SIZE];
+        ssize_t n = read(socket, buff, BUFF_SIZE);
+        if(n == -1) {
+            line = buffer;
+            buffer = "";
+            return false;
+        }
+        buff[n] = 0;
+        buffer += buff;
+
     }
-    else {
-        clientInfo.uiHost = uiHost;
-        clientInfo.uiPort = DEFAULT_UI_PORT;
-    }
+    // splitting into line and the rest of buffer
+    line = string(buffer.begin(), pos);
+    buffer = string(pos+1, buffer.end());
+    return true;
 }
 
-void parseArguments(int argc, char **argv) {
-    if(argc < MIN_ARGS)
-        die(INIT_MSG);
-    clientInfo.playerName = argv[1];
-    parseServerInfo(string(argv[2]));
-
-    if(argc > MIN_ARGS)
-        parseUIInfo(string(argv[3]));
-    else {
-        clientInfo.uiHost = DEFAULT_UI_HOST;
-        clientInfo.uiPort = DEFAULT_UI_PORT;
+void readFromGui(GuiInfo &guiInfo) {
+    string line;
+    while(true) {
+        if(!readLineFromGui(guiInfo.socket, line))
+            die("Wrong message from GUI");
+        std::cout << line << std::endl;
+        guiLock.lock();
+        if(line == turns::LEFT_DOWN)
+            guiInfo.leftPressed = true;
+        else if(line == turns::LEFT_UP)
+            guiInfo.leftPressed = false;
+        else if(line == turns::RIGHT_DOWN)
+            guiInfo.rightPressed = true;
+        else if(line == turns::RIGHT_UP)
+            guiInfo.rightPressed = false;
+        else
+            die("Wrong message from GUI");
+        guiLock.unlock();
     }
+
 }
 
 int main(int argc, char **argv) {
-    parseArguments(argc, argv);
+    ClientInfo clientInfo = parseArguments(argc, argv);
+    GuiInfo guiInfo(false, false);
+    connectToGUI(clientInfo, guiInfo.socket);
+    // odpalam watek ktory co 20ms wysyla do sewera komunikat
+    readFromGui(guiInfo);
     return 0;
 }
