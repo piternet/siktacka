@@ -109,11 +109,11 @@ void readFromGui(GuiInfo &guiInfo) {
 }
 
 void sendToGui(GuiInfo &guiInfo, Event event) {
-
     string message = event.toGuiRepr(game);
     if(message == "X")
         return;
     printf("I SEND TO GUI: %s", message.c_str());
+    usleep(500);
     if(send(guiInfo.socket, message.c_str(), message.size()+1, 0) < 0)
         die("Error when communicating with GUI");
     //std::cout << "sent: " << message << " to gui" << std::endl;
@@ -123,7 +123,6 @@ void readFromServer(ServerInfo &serverInfo) {
     char buffer[RECV_BUFF_SIZE];
     bzero(buffer, RECV_BUFF_SIZE);
     int pos = 4;
-    dataLock.lock();
     if(recv(serverInfo.socket, buffer, RECV_BUFF_SIZE, 0) < 0)
         die("Error while receiving message from server");
 
@@ -139,7 +138,6 @@ void readFromServer(ServerInfo &serverInfo) {
             dataLock.unlock();
         }
     }
-    dataLock.unlock();
 }
 
 void sendMessageToServer(ClientData &clientData, ServerInfo &serverInfo) {
@@ -180,6 +178,9 @@ void timerStart() {
 }
 
 void handleConnections(GuiInfo &guiInfo, ServerInfo &serverInfo) {
+
+
+
     while(running) {
         int guiRv = poll(&guiInfo.ufds, 2, POLL_INTERVAL);
         if(guiRv > 0)
@@ -206,6 +207,5 @@ int main(int argc, char **argv) {
     // thread that send messages to server every SEND_INTERVAL ms
     timerStart();
     handleConnections(guiInfo, serverInfo);
-    int timeout(-1);
     return 0;
 }
