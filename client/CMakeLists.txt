@@ -9,5 +9,5 @@ add_executable(BoostTest ${SOURCE_FILES} )
 target_link_libraries(BoostTest ${Boost_LIBRARIES})
 
 find_package( Threads REQUIRED )
-add_executable(client ${SOURCE_FILES} game.cpp game.h)
+add_executable(client ${SOURCE_FILES} game.cpp game.h event.cpp event.h)
 target_link_libraries(client Threads::Threads)

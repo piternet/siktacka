@@ -37,7 +37,8 @@ void parseUIInfo(string uiHost) {
 ClientInfo parseArguments(int argc, char **argv) {
     if(argc < MIN_ARGS)
         die(INIT_MSG);
-    clientInfo.playerName = argv[1];
+    string playerName(argv[1]);
+    clientInfo.playerName = playerName;
     parseServerInfo(string(argv[2]));
 
     if(argc > MIN_ARGS)
